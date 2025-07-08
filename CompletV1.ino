@@ -1,6 +1,7 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include <EEPROM.h>
+#include <esp32-hal-ledc.h> // Explicitly include for LEDC functions
 
 // Configuration du point d'accès WiFi
 const char* ap_ssid = "Machine à plantes";
@@ -228,11 +229,11 @@ void loop() {
   État_Minuit = Minuit;
 
   // Update pump states based on their individual PompeX variables (set in PlanteX or by manual override)
-  DigitalWrite(PattePompe1, Pompe1);
-  DigitalWrite(PattePompe2, Pompe2);
-  DigitalWrite(PattePompe3, Pompe3);
-  DigitalWrite(PattePompe4, Pompe4);
-  DigitalWrite(PattePompe5, Pompe5);
+  digitalWrite(PattePompe1, Pompe1);
+  digitalWrite(PattePompe2, Pompe2);
+  digitalWrite(PattePompe3, Pompe3);
+  digitalWrite(PattePompe4, Pompe4);
+  digitalWrite(PattePompe5, Pompe5);
 
   // Light control logic
   if (Manuel) {
@@ -482,6 +483,10 @@ html += R"(
 </body></html>
 )";
   server.send(200, "text/html", html);
+}
+
+void handleRedPage() { // Mode Manuel page
+    server.send(200, "text/html", htmlRedPage);
 }
 
 void handleGreenPage() { // Configuration Page
