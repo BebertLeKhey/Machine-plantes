@@ -241,27 +241,31 @@ void loop() {
     for (int i = 0; i < 5; i++) {
       if (i == 0) { // Only plant 1 has LED pins defined for now
         int manualBrightnessSetting = map(plantManualStates[i].sliderValue, 0, 100, 0, 24); // map slider 0-100 to profile brightness 0-24
-        // Use last assigned color for manual mode, or a default like white if no color assigned yet.
-        const char* colorToUse = (plantsA[i].lightColor[0] == '#' ? plantsA[i].lightColor : "#FFFFFF");
-        setPlantLedColor(i, colorToUse, manualBrightnessSetting);
+        // Use the plant's stored colorOption. plantsA[i].colorOption should be valid (0,1,2) due to loadData logic.
+        setPlantLedColor(i, plantsA[i].colorOption, manualBrightnessSetting);
       }
-      // Else: Off for other plants or implement their LED controls
-      // else { setPlantLedColor(i, "#000000", 0); } // Example: turn others off
+      // Else: Off for other plants or implement their LED controls.
+      // Example: if plant 'i' had LEDs, call setPlantLedColor(i, plantsA[i].colorOption, manualBrightnessSetting);
+      // else { setPlantLedColor(i, 0, 0); } // If no LEDs for plant i, ensure it's handled or remove.
     }
   } else {
     // Automatic light control based on profiles
     // Only Plant 1 (index 0) for now
     if (plantsA[0].profileIndex != -1) {
       int profileIdx = plantsA[0].profileIndex;
-      if (profileIdx >= 0 && profileIdx < 50) {
-          setPlantLedColor(0, plantsA[0].lightColor, profiles[profileIdx].brightness);
+      if (profileIdx >= 0 && profileIdx < 50) { // Ensure profile index is valid
+          // Pass the stored integer colorOption
+          setPlantLedColor(0, plantsA[0].colorOption, profiles[profileIdx].brightness);
       } else {
-          setPlantLedColor(0, "#000000", 0); // Turn off if profile is invalid
+          // Invalid profile, turn LED off (e.g., color Yellow at 0% brightness)
+          setPlantLedColor(0, 0, 0);
       }
     } else {
-      setPlantLedColor(0, "#000000", 0); // Turn off if no profile assigned
+      // No profile assigned, turn LED off
+      setPlantLedColor(0, 0, 0);
     }
-    // Extend for other plants if they have LEDs and profiles
+    // Extend for other plants if they have LEDs and profiles:
+    // e.g. if (plantsA[1].profileIndex != -1) { ... setPlantLedColor(1, plantsA[1].colorOption, ...); }
   }
 }
 
@@ -769,5 +773,3 @@ button:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(0,0,0,0.2);}
 }
 
 // --- END Web Server Handlers and HTML/CSS ---
-
-[end of CompletV1.ino]
