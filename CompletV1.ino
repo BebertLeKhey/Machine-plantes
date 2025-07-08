@@ -278,24 +278,19 @@ void parseHexColor(const char* hexColor, int &r, int &g, int &b) {
 const int PWM_FREQ = 5000; // PWM frequency in Hz
 const int PWM_RESOLUTION = 8; // 8-bit resolution (0-255)
 
-// Channels for Plant 1 LED
-const int LEDC_CHANNEL_R1 = 0;
-const int LEDC_CHANNEL_G1 = 1;
-const int LEDC_CHANNEL_B1 = 2;
 // Add more channels for other plants' LEDs if needed
 
 void setupLedPwm() {
-    // Plant 1 LED
-    ledcSetup(LEDC_CHANNEL_R1, PWM_FREQ, PWM_RESOLUTION);
-    ledcAttachPin(LED_R_PIN_1, LEDC_CHANNEL_R1);
-    ledcSetup(LEDC_CHANNEL_G1, PWM_FREQ, PWM_RESOLUTION);
-    ledcAttachPin(LED_G_PIN_1, LEDC_CHANNEL_G1);
-    ledcSetup(LEDC_CHANNEL_B1, PWM_FREQ, PWM_RESOLUTION);
-    ledcAttachPin(LED_B_PIN_1, LEDC_CHANNEL_B1);
+    // Plant 1 LED - Using new API: ledcAttach(pin, freq, resolution)
+    // Channels are managed internally by the new API.
+    ledcAttach(LED_R_PIN_1, PWM_FREQ, PWM_RESOLUTION);
+    ledcAttach(LED_G_PIN_1, PWM_FREQ, PWM_RESOLUTION);
+    ledcAttach(LED_B_PIN_1, PWM_FREQ, PWM_RESOLUTION);
 
     // Setup other plants' LEDs here if they exist
-    // e.g., ledcSetup(LEDC_CHANNEL_R2, PWM_FREQ, PWM_RESOLUTION);
-    //       ledcAttachPin(LED_R_PIN_2, LEDC_CHANNEL_R2);
+    // e.g., ledcAttach(LED_R_PIN_2, PWM_FREQ, PWM_RESOLUTION);
+    //       ledcAttach(LED_G_PIN_2, PWM_FREQ, PWM_RESOLUTION);
+    //       ledcAttach(LED_B_PIN_2, PWM_FREQ, PWM_RESOLUTION);
 }
 
 // Function to set the color and brightness for a plant's LED
@@ -330,14 +325,14 @@ void setPlantLedColor(int plantIndex, const char* hexColor, int brightnessPercen
     g = constrain(g, 0, 255);
     b = constrain(b, 0, 255);
 
-    if (plantIndex == 0) { // For Plant 1
-        ledcWrite(LEDC_CHANNEL_R1, r);
-        ledcWrite(LEDC_CHANNEL_G1, g);
-        ledcWrite(LEDC_CHANNEL_B1, b);
+    if (plantIndex == 0) { // For Plant 1 - Using new API: ledcWrite(pin, value)
+        ledcWrite(LED_R_PIN_1, r);
+        ledcWrite(LED_G_PIN_1, g);
+        ledcWrite(LED_B_PIN_1, b);
     }
     // Add else if for other plants:
     // else if (plantIndex == 1) {
-    //   ledcWrite(LEDC_CHANNEL_R2, r);
+    //   ledcWrite(LED_R_PIN_2, r); // Assuming LED_R_PIN_2 is defined
     //   ...
     // }
     // Serial.printf("Plant %d LED: #%s, Bright: %d%% -> R:%d G:%d B:%d\n", plantIndex+1, hexColor, brightnessPercent, r, g, b);
